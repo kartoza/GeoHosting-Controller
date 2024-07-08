@@ -29,5 +29,4 @@ api += router.urls
 
 urlpatterns = [
     path('api/', include(api)),
-    path('', RedirectView.as_view(url='/admin'), name='index')
 ]
