@@ -2,7 +2,6 @@ import os
 
 from PIL.Image import Image
 from django.db.models import ImageField
-from django.forms import ImageField as FormImageField, FileField
 
 from django.core.exceptions import ValidationError
 from django.utils.deconstruct import deconstructible

@@ -65,19 +65,23 @@ class InstanceAdmin(admin.ModelAdmin):
         """Return cluster."""
         return obj.cluster.code
 
+
 class PricingInline(admin.TabularInline):
     model = Pricing
     extra = 1
+
 
 class ProductAdmin(admin.ModelAdmin):
     list_display = ('name', 'upstream_id', 'available')
     search_fields = ('name', 'upstream_id')
     inlines = [PricingInline]
 
+
 class PricingAdmin(admin.ModelAdmin):
     list_display = ('name', 'price', 'product', 'created_at', 'updated_at')
     search_fields = ('name', 'product__name')
     list_filter = ('created_at', 'updated_at')
+
 
 admin.site.register(Product, ProductAdmin)
 admin.site.register(Pricing, PricingAdmin)
