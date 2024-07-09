@@ -9,7 +9,7 @@ from django.contrib.auth import get_user_model
 from django.db.models import Q
 
 from geohosting.models import (
-    Activity, ActivityType, ActivityStatus, Cluster, Instance, Pricing
+    Activity, ActivityType, ActivityStatus, Cluster, Instance, Package
 )
 from geohosting.models.product import Product
 from geohosting_controller.exceptions import (
@@ -54,7 +54,7 @@ def _post_data(
 
 
 def create(
-        product: Product, price: Pricing, subdomain: str, user: User
+        product: Product, price: Package, subdomain: str, user: User
 ) -> Activity:
     """Create an instance.
 

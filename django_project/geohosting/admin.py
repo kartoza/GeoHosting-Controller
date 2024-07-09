@@ -7,7 +7,8 @@ GeoHosting Controller.
 from django.contrib import admin
 
 from geohosting.models import (
-    Activity, ActivityType, Region, Product, Cluster, Instance, Pricing
+    Activity, ActivityType, Region, Product, Cluster, Instance, Package,
+    WebhookEvent
 )
 
 
@@ -22,17 +23,16 @@ class ActivityAdmin(admin.ModelAdmin):
     """Activity admin."""
 
     list_display = (
-        'id', 'activity_type', 'triggered_at', 'triggered_by', 'status',
-        'client_data'
+        'id', 'instance', 'activity_type', 'triggered_at', 'triggered_by',
+        'status', 'client_data'
     )
+    list_filter = ('instance', 'triggered_at', 'triggered_by')
     actions = [get_jenkins_status]
-
-    def triggered_by(self, obj: Activity):
-        """Get user_email from data."""
-        try:
-            return obj.client_data['user_email']
-        except KeyError:
-            return None
+    readonly_fields = (
+        'activity_type', 'instance', 'triggered_at', 'triggered_by',
+        'client_data', 'post_data',
+        'note', 'jenkins_queue_url', 'jenkins_build_url'
+    )
 
 
 @admin.register(ActivityType)
@@ -66,18 +66,20 @@ class InstanceAdmin(admin.ModelAdmin):
         return obj.cluster.code
 
 
-class PricingInline(admin.TabularInline):
-    model = Pricing
+class PackageInline(admin.TabularInline):
+    model = Package
     extra = 1
 
 
+@admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
     list_display = ('name', 'upstream_id', 'available')
     search_fields = ('name', 'upstream_id')
-    inlines = [PricingInline]
+    inlines = [PackageInline]
 
 
-class PricingAdmin(admin.ModelAdmin):
+@admin.register(Package)
+class PackageAdmin(admin.ModelAdmin):
     list_display = (
         'name', 'price', 'product', 'created_at', 'updated_at', 'package_code'
     )
@@ -85,6 +87,5 @@ class PricingAdmin(admin.ModelAdmin):
     list_filter = ('created_at', 'updated_at')
 
 
-admin.site.register(Product, ProductAdmin)
-admin.site.register(Pricing, PricingAdmin)
 admin.site.register(Region)
+admin.site.register(WebhookEvent)

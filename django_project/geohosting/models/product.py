@@ -75,13 +75,13 @@ class ProductMedia(models.Model):
         ordering = ['product__order', 'order']
 
 
-class Pricing(models.Model):
-    """Pricing model for products."""
+class Package(models.Model):
+    """Package model for products."""
 
     product = models.ForeignKey(
         Product,
         on_delete=models.CASCADE,
-        related_name='pricings'
+        related_name='packages'
     )
     name = models.CharField(
         max_length=256
@@ -112,5 +112,5 @@ class Pricing(models.Model):
         ordering = ['product__order', 'order']
 
     def __str__(self):
-        """Return pricing name and price."""
+        """Return package name and price."""
         return f"{self.name} - {self.price}"

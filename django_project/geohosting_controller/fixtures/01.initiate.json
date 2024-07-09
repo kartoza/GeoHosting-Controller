@@ -38,7 +38,7 @@
     }
   },
   {
-    "model": "geohosting.pricing",
+    "model": "geohosting.package",
     "pk": 1,
     "fields": {
       "product": 1,

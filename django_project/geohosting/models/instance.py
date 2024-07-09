@@ -9,7 +9,7 @@ from django.contrib.auth import get_user_model
 from django.db import models
 
 from geohosting.models.cluster import Cluster
-from geohosting.models.product import Pricing
+from geohosting.models.product import Package
 
 User = get_user_model()
 
@@ -21,7 +21,7 @@ class Instance(models.Model):
         max_length=256
     )
     price = models.ForeignKey(
-        Pricing, on_delete=models.CASCADE,
+        Package, on_delete=models.CASCADE,
     )
     cluster = models.ForeignKey(
         Cluster, on_delete=models.CASCADE,

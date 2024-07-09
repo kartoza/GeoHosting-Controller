@@ -11,6 +11,7 @@ from django.contrib.auth import get_user_model
 from django.db import models
 from django.utils import timezone
 
+from geohosting.models.instance import Instance
 from geohosting_controller.connection import request_post, request_get
 from geohosting_controller.exceptions import (
     ConnectionErrorException, ActivityException
@@ -60,6 +61,10 @@ class Activity(models.Model):
     activity_type = models.ForeignKey(
         ActivityType, on_delete=models.CASCADE,
     )
+    instance = models.ForeignKey(
+        Instance, on_delete=models.SET_NULL,
+        null=True, blank=True, editable=False
+    )
 
     # Creation metadata
     triggered_at = models.DateTimeField(
@@ -67,17 +72,17 @@ class Activity(models.Model):
         editable=False
     )
     triggered_by = models.ForeignKey(
-        User, on_delete=models.CASCADE
+        User, on_delete=models.CASCADE, editable=False
     )
 
     # Data metadata
     client_data = models.JSONField(
         null=True, blank=True,
-        help_text='Data received from client.'
+        help_text='Data received from client.', editable=False
     )
     post_data = models.JSONField(
         null=True, blank=True,
-        help_text='Data posted to jenkins.'
+        help_text='Data posted to jenkins.', editable=False
     )
 
     # Jenkins metadata
@@ -95,15 +100,15 @@ class Activity(models.Model):
     )
     note = models.TextField(
         null=True, blank=True,
-        help_text='Note about activity.'
+        help_text='Note about activity.', editable=False
     )
     jenkins_queue_url = models.CharField(
         max_length=256,
-        null=True, blank=True
+        null=True, blank=True, editable=False
     )
     jenkins_build_url = models.CharField(
         max_length=256,
-        null=True, blank=True
+        null=True, blank=True, editable=False
     )
 
     class Meta:  # noqa

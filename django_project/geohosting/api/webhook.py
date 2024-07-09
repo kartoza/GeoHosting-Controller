@@ -11,7 +11,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from geohosting.models import (
-    Activity, ActivityStatus, Instance, Cluster, Pricing
+    Activity, ActivityStatus, Instance, Cluster, Package, WebhookEvent
 )
 from geohosting_controller.variables import ActivityTypeTerm
 
@@ -25,6 +25,11 @@ class WebhookView(APIView):
         """Create new instance."""
         data = request.data
         try:
+            WebhookEvent.objects.create(
+                data=data,
+            )
+
+            # Check the data
             app_name = data['app_name']
             activity = Activity.objects.filter(
                 status=ActivityStatus.BUILD_ARGO
@@ -41,14 +46,14 @@ class WebhookView(APIView):
                 )
                 Instance.objects.create(
                     name=activity.client_data['app_name'],
-                    price=Pricing.objects.get(
+                    price=Package.objects.get(
                         package_code=activity.client_data['package_code']
                     ),
                     cluster=cluster,
                     owner=activity.triggered_by
                 )
             activity.save()
-        except (KeyError, Activity.DoesNotExist, Pricing.DoesNotExist) as e:
+        except (KeyError, Activity.DoesNotExist, Package.DoesNotExist) as e:
             return HttpResponseBadRequest(f'{e}')
 
         return Response()

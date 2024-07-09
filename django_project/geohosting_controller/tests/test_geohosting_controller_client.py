@@ -10,7 +10,9 @@ from django.test.client import Client
 from django.test.testcases import TestCase
 from knox.models import AuthToken
 
-from geohosting.models import Activity, Instance, Product, Pricing
+from geohosting.models import (
+    Activity, Instance, Product, Package, WebhookEvent
+)
 from geohosting_controller.activity import create
 from geohosting_controller.exceptions import (
     ConnectionErrorException, NoJenkinsUserException, NoJenkinsTokenException,
@@ -35,6 +37,9 @@ class ControllerTest(TestCase):
         self.user = User.objects.create(
             username='user', password='password'
         )
+        auth_token, self.user_token = AuthToken.objects.create(
+            user=self.user
+        )
 
         self.admin = User.objects.create(
             username='admin', password='password',
@@ -49,7 +54,7 @@ class ControllerTest(TestCase):
         """Create function."""
         return create(
             Product.objects.get(name='Geonode'),
-            Pricing.objects.get(package_code='dev-1'),
+            Package.objects.get(package_code='dev-1'),
             sub_domain, self.admin
         )
 
@@ -140,14 +145,26 @@ class ControllerTest(TestCase):
 
                 # Run webhook, should be run by Argo CD
                 client = Client()
+                webhook_data = {
+                    'app_name': self.sub_domain,
+                    'state': 'successful'
+                }
+                # If not admin
                 response = client.post(
-                    '/api/webhook/', data={
-                        'app_name': self.sub_domain,
-                        'state': 'successful'
-                    },
+                    '/api/webhook/', data=webhook_data,
+                    headers={'Authorization': f'Token {self.user_token}'}
+                )
+                self.assertEqual(response.status_code, 403)
+
+                # Success if admin
+                response = client.post(
+                    '/api/webhook/', data=webhook_data,
                     headers={'Authorization': f'Token {self.admin_token}'}
                 )
                 self.assertEqual(response.status_code, 200)
+                self.assertEqual(
+                    WebhookEvent.objects.all().first().data, webhook_data
+                )
 
                 # Get the activity status from server
                 activity = Activity.objects.get(id=activity.id)
