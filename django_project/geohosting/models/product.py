@@ -9,11 +9,17 @@ class Product(models.Model):
     """Product model."""
 
     name = models.CharField(
-        max_length=256)
-    order = models.PositiveIntegerField(default=0)
+        max_length=256
+    )
+    order = models.PositiveIntegerField(
+        default=0
+    )
     upstream_id = models.CharField(
-        max_length=256)
-    description = models.TextField(blank=True)
+        max_length=256
+    )
+    description = models.TextField(
+        blank=True
+    )
     cluster = models.ForeignKey(
         Cluster,
         on_delete=models.CASCADE,

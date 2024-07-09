@@ -12,11 +12,11 @@ from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from geohosting_controller.exceptions import NoClusterException
 from geohosting.models import (
     Activity, ActivityType, ActivityStatus, Cluster, Product, Instance
 )
-from geohosting_controller.serializer.activity import ActivitySerializer
+from geohosting.serializer.activity import ActivitySerializer
+from geohosting_controller.exceptions import NoClusterException
 from geohosting_controller_client.variables import (
     ActivityType as VarActivityType
 )
@@ -48,7 +48,7 @@ class RequestView(APIView):
                     Q(status=ActivityStatus.ERROR) |
                     Q(status=ActivityStatus.SUCCESS)
                 ):
-                    raise ValueError('Instance already exists')
+                    raise ValueError('Some of activity is already running')
 
                 return {
                     'subdomain': data['subdomain'],

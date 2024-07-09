@@ -1,6 +1,6 @@
 [
   {
-    "model": "geohosting_controller.region",
+    "model": "geohosting.region",
     "pk": 1,
     "fields": {
       "name": "Global",
@@ -8,24 +8,29 @@
     }
   },
   {
-    "model": "geohosting_controller.cluster",
+    "model": "geohosting.cluster",
     "pk": 1,
     "fields": {
       "code": "ktz-dev-ks-gn-01",
-      "region": 1
+      "region": 1,
+      "domain": null
     }
   },
   {
-    "model": "geohosting_controller.product",
+    "model": "geohosting.product",
     "pk": 1,
     "fields": {
       "name": "Geonode",
-      "code": "gn",
-      "cluster": 1
+      "order": 0,
+      "upstream_id": "1",
+      "description": "",
+      "cluster": 1,
+      "image": "",
+      "available": false
     }
   },
   {
-    "model": "geohosting_controller.activitytype",
+    "model": "geohosting.activitytype",
     "pk": 1,
     "fields": {
       "identifier": "INSTANCE.CREATE",

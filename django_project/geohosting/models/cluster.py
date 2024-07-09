@@ -7,11 +7,18 @@ class Cluster(models.Model):
     """Cluster model."""
 
     code = models.CharField(
-        max_length=256)
+        max_length=256
+    )
     region = models.ForeignKey(
-        Region, on_delete=models.CASCADE)
-    url = models.CharField(
-        max_length=256, null=True, blank=True)
+        Region,
+        on_delete=models.CASCADE
+    )
+    domain = models.CharField(
+        max_length=256,
+        null=True,
+        blank=True,
+        help_text='Domain url of the cluster'
+    )
 
     def __str__(self):
         """Return region name."""

@@ -46,7 +46,7 @@ class ActivityTypeAdmin(admin.ModelAdmin):
 class ClusterAdmin(admin.ModelAdmin):
     """Cluster admin."""
 
-    list_display = ('code', 'region', 'url')
+    list_display = ('code', 'region', 'domain')
 
 
 @admin.register(Instance)
