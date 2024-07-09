@@ -6,7 +6,6 @@ from rest_framework.routers import DefaultRouter
 from geohosting.api.activity import (
     ActivityViewSet, ActivityTypeViewSet
 )
-from geohosting.api.request import RequestView
 from geohosting.api.token import CreateToken
 from geohosting.api.webhook import WebhookView
 from geohosting.views.home import HomeView
@@ -21,7 +20,6 @@ router.register(
 )
 
 api = [
-    path('request/', RequestView.as_view(), name='request-api'),
     path('webhook/', WebhookView.as_view(), name='webhook-api'),
     path('token/create', CreateToken.as_view(), name='create-token'),
 ]

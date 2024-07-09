@@ -36,5 +36,19 @@
       "identifier": "INSTANCE.CREATE",
       "jenkins_url": "https://jenkins.do.kartoza.com/job/kartoza/job/devops/job/geohosting/job/geonode_create/buildWithParameters"
     }
+  },
+  {
+    "model": "geohosting.pricing",
+    "pk": 1,
+    "fields": {
+      "product": 1,
+      "name": "Geonode-1",
+      "price": "100.00",
+      "feature_list": null,
+      "order": 0,
+      "created_at": "2024-07-09T05:58:27.890Z",
+      "updated_at": "2024-07-09T05:58:27.891Z",
+      "package_code": "dev-1"
+    }
   }
 ]

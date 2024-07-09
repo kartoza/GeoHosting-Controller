@@ -1,3 +1,10 @@
+# coding=utf-8
+"""
+GeoHosting.
+
+.. note:: Cluster model.
+"""
+
 from django.db import models
 
 from geohosting.models.region import Region

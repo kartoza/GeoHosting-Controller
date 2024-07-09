@@ -1,11 +1,22 @@
+# coding=utf-8
+"""
+GeoHosting.
+
+.. note:: Activity model.
+"""
+
 import re
 
+from django.contrib.auth import get_user_model
 from django.db import models
 from django.utils import timezone
 
-from geohosting.models.product import Product
 from geohosting_controller.connection import request_post, request_get
-from geohosting_controller.exceptions import ConnectionErrorException
+from geohosting_controller.exceptions import (
+    ConnectionErrorException, ActivityException
+)
+
+User = get_user_model()
 
 
 class ActivityType(models.Model):
@@ -49,20 +60,27 @@ class Activity(models.Model):
     activity_type = models.ForeignKey(
         ActivityType, on_delete=models.CASCADE,
     )
-    product = models.ForeignKey(
-        Product, on_delete=models.CASCADE,
+
+    # Creation metadata
+    triggered_at = models.DateTimeField(
+        default=timezone.now,
+        editable=False
     )
+    triggered_by = models.ForeignKey(
+        User, on_delete=models.CASCADE
+    )
+
+    # Data metadata
     client_data = models.JSONField(
         null=True, blank=True,
         help_text='Data received from client.'
     )
     post_data = models.JSONField(
-        null=True, blank=True
+        null=True, blank=True,
+        help_text='Data posted to jenkins.'
     )
-    triggered_at = models.DateTimeField(
-        default=timezone.now,
-        editable=False
-    )
+
+    # Jenkins metadata
     status = models.CharField(
         default=ActivityStatus.RUNNING,
         choices=(
@@ -79,8 +97,6 @@ class Activity(models.Model):
         null=True, blank=True,
         help_text='Note about activity.'
     )
-
-    # Jenkins data
     jenkins_queue_url = models.CharField(
         max_length=256,
         null=True, blank=True
@@ -158,7 +174,7 @@ class Activity(models.Model):
             self.status = ActivityStatus.ERROR
             self.note = f'{e}'
             self.save()
-            raise Exception(f'{e}')
+            raise
 
     def save(self, *args, **kwargs):
         """Override importer saved."""
@@ -168,6 +184,9 @@ class Activity(models.Model):
             self.run()
 
     @staticmethod
-    def is_valid(name):
+    def test_name(name):
         """Validate name."""
-        return re.match(r'^[a-zA-Z0-9-]*$', name)
+        if not re.match(r'^[a-zA-Z0-9-]*$', name):
+            raise ActivityException(
+                'App name just contains letter, number and dash'
+            )

@@ -22,8 +22,8 @@ class ActivityAdmin(admin.ModelAdmin):
     """Activity admin."""
 
     list_display = (
-        'id', 'product', 'activity_type', 'triggered_at', 'triggered_by',
-        'status'
+        'id', 'activity_type', 'triggered_at', 'triggered_by', 'status',
+        'client_data'
     )
     actions = [get_jenkins_status]
 
@@ -54,12 +54,12 @@ class InstanceAdmin(admin.ModelAdmin):
     """Instance admin."""
 
     list_display = (
-        'name', 'product', 'cluster', 'package_id', 'owner_email'
+        'name', 'product', 'cluster', 'price', 'owner'
     )
 
     def product(self, obj: Instance):
         """Return product."""
-        return obj.product.name
+        return obj.price.product.name
 
     def cluster(self, obj: Instance):
         """Return cluster."""
@@ -78,7 +78,9 @@ class ProductAdmin(admin.ModelAdmin):
 
 
 class PricingAdmin(admin.ModelAdmin):
-    list_display = ('name', 'price', 'product', 'created_at', 'updated_at')
+    list_display = (
+        'name', 'price', 'product', 'created_at', 'updated_at', 'package_code'
+    )
     search_fields = ('name', 'product__name')
     list_filter = ('created_at', 'updated_at')
 

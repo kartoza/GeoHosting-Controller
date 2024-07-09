@@ -11,9 +11,9 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from geohosting.models import (
-    Activity, ActivityStatus, Instance, Cluster, Product
+    Activity, ActivityStatus, Instance, Cluster, Pricing
 )
-from geohosting_controller_client.variables import ActivityType
+from geohosting_controller.variables import ActivityTypeTerm
 
 
 class WebhookView(APIView):
@@ -31,25 +31,24 @@ class WebhookView(APIView):
             ).filter(client_data__app_name=app_name).first()
             activity.status = ActivityStatus.SUCCESS
             activity.note = json.dumps(data)
+
             if (
                     activity.activity_type.identifier ==
-                    ActivityType.CREATE_INSTANCE.value
+                    ActivityTypeTerm.CREATE_INSTANCE.value
             ):
                 cluster = Cluster.objects.get(
                     code=activity.post_data['k8s_cluster']
                 )
-                product = Product.objects.get(
-                    name__iexact=activity.client_data['product']
-                )
                 Instance.objects.create(
                     name=activity.client_data['app_name'],
+                    price=Pricing.objects.get(
+                        package_code=activity.client_data['package_code']
+                    ),
                     cluster=cluster,
-                    product=product,
-                    package_id=activity.client_data['package_id'],
-                    owner_email=activity.client_data['user_email'],
+                    owner=activity.triggered_by
                 )
             activity.save()
-        except (KeyError, Activity.DoesNotExist) as e:
+        except (KeyError, Activity.DoesNotExist, Pricing.DoesNotExist) as e:
             return HttpResponseBadRequest(f'{e}')
 
         return Response()
