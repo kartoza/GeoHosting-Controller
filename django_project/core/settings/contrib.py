@@ -54,17 +54,17 @@ WEBPACK_BASE_DIR = os.path.dirname(
     os.path.dirname(
         os.path.dirname(os.path.abspath(__file__))))
 WEBPACK_LOADER = {
-  'DEFAULT': {
-    'CACHE': True,
-    'STATS_FILE': os.path.join(
-        WEBPACK_BASE_DIR,
-        'geohosting',
-        'assets',
-        'webpack_bundles',
-        'webpack-stats.json'),
-    'POLL_INTERVAL': 0.1,
-    'TIMEOUT': None,
-    'IGNORE': [r'.+\.hot-update.js', r'.+\.map'],
-    'LOADER_CLASS': 'webpack_loader.loader.WebpackLoader',
-  }
+    'DEFAULT': {
+        'CACHE': True,
+        'STATS_FILE': os.path.join(
+            WEBPACK_BASE_DIR,
+            'geohosting',
+            'assets',
+            'webpack_bundles',
+            'webpack-stats.json'),
+        'POLL_INTERVAL': 0.1,
+        'TIMEOUT': None,
+        'IGNORE': [r'.+\.hot-update.js', r'.+\.map'],
+        'LOADER_CLASS': 'webpack_loader.loader.WebpackLoader',
+    }
 }
