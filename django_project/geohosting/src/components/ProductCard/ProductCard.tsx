@@ -20,6 +20,7 @@ const ProductCard: React.FC<CardProps> = ({ image, title, description, comingSoo
       paddingTop={5}
       paddingBottom={5}
       position="relative"
+      height={350}
       backgroundColor={selected ? "blue.100" : "gray.200"}
       borderColor={"gray.200"}
       width={["500px", "350px", "320px", "320px"]}
