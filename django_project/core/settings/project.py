@@ -53,14 +53,12 @@ ERPNEXT_BASE_URL = os.environ.get('ERPNEXT_BASE_URL', '')
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': (
-            'django.contrib.auth.password_validation.'
-            'UserAttributeSimilarityValidator',
-        )
+            'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'
+        ),
     },
     {
         'NAME': (
-            'django.contrib.auth.password_validation.'
-            'MinimumLengthValidator'
+            'django.contrib.auth.password_validation.MinimumLengthValidator'
         ),
         'OPTIONS': {
             'min_length': 8,
@@ -68,14 +66,12 @@ AUTH_PASSWORD_VALIDATORS = [
     },
     {
         'NAME': (
-            'django.contrib.auth.password_validation.'
-            'CommonPasswordValidator'
+            'django.contrib.auth.password_validation.CommonPasswordValidator'
         ),
     },
     {
         'NAME': (
-            'django.contrib.auth.password_validation.'
-            'NumericPasswordValidator'
+            'django.contrib.auth.password_validation.NumericPasswordValidator'
         ),
     },
 ]

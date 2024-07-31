@@ -143,24 +143,11 @@ admin.site.register(WebhookEvent)
 @admin.action(description="Push to erpnext")
 def push_user_to_erpnext(modeladmin, request, queryset):
     for user in queryset:
-        data = {
-            "doctype": "Customer",
-            "customer_name": user.get_full_name(),
-            "customer_type": "Individual",
-            "customer_group": "Commercial",
-            "territory": "All Territories",
-            "tax_category": "VAT"
-        }
-        result = post_to_erpnext(
-            data,
-            'Customer'
+        user_profile, created = (
+            UserProfile.objects.get_or_create(user=user)
         )
+        result = user_profile.post_to_erpnext()
         if result['status'] == 'success':
-            user_profile, created = (
-                UserProfile.objects.get_or_create(user=user)
-            )
-            user_profile.erpnext_code = result['id']
-            user_profile.save()
             messages.add_message(
                 request,
                 messages.SUCCESS,
