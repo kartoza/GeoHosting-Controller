@@ -7,7 +7,6 @@ GeoHosting Controller.
 from django.contrib import admin, messages
 from django.contrib.auth.models import User
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
-from geohosting.utils.erpnext import post_to_erpnext
 
 from geohosting.forms.activity import CreateInstanceForm
 from geohosting.models import (
