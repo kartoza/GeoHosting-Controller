@@ -98,7 +98,7 @@ def fetch_erpnext_data(doctype, filters=None):
 
 def post_to_erpnext(data, doctype):
     """
-    Posts data to ERPNext and handles conflict if the data already exists.
+    Post data to ERPNext and handle conflict if the data already exists.
 
     Parameters:
         data (dict): The data to post.
