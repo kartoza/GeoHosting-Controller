@@ -55,7 +55,7 @@ def parse_description(html_content: str) -> dict:
 def save_product_image(
         obj, product_desc: dict, title_key, description_key, image_path: str
 ):
-    """Saves product image from description of dict."""
+    """Save product image from description of dict."""
     try:
         title = product_desc[title_key]
         description = product_desc[description_key]
@@ -75,7 +75,7 @@ def save_product_image(
 
 
 def fetch_products_from_erpnext():
-    """Fetch products from ERPNEXT API"""
+    """Fetch products from ERPNEXT API."""
     doctype = 'Item'
 
     product_list = fetch_erpnext_data(
@@ -125,7 +125,8 @@ def fetch_products_from_erpnext():
             save_product_image(
                 product_obj, desc, 'overview_continuation_header',
                 'overview_continuation',
-                f'/assets/geohosting/images/Product_Images/{name}/secondary.png'
+                f'/assets/geohosting/images/Product_Images/{name}/'
+                f'secondary.png'
             )
 
             # Save all description to product metadata
