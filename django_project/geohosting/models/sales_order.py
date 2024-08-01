@@ -1,6 +1,7 @@
+from datetime import timedelta
+
 from django.contrib.auth import get_user_model
 from django.db import models
-from datetime import timedelta
 from django.utils.timezone import now
 
 from geohosting.models.user_profile import UserProfile
@@ -11,6 +12,13 @@ User = get_user_model()
 
 def get_default_delivery_date():
     return now() + timedelta(days=1)
+
+
+class SalesOrderStatus:
+    """Order Status."""
+
+    WAITING_PAYMENT = 'Waiting Payment'
+    PAID = 'Paid'
 
 
 class SalesOrder(models.Model):
@@ -43,6 +51,23 @@ class SalesOrder(models.Model):
     erpnext_code = models.CharField(
         default='',
         blank=True
+    )
+    stripe_checkout_id = models.CharField(
+        blank=True,
+        null=True,
+        help_text='Checkout id on the stripe.'
+    )
+    order_status = models.CharField(
+        default=SalesOrderStatus.WAITING_PAYMENT,
+        choices=(
+            (
+                SalesOrderStatus.WAITING_PAYMENT,
+                SalesOrderStatus.WAITING_PAYMENT
+            ),
+            (SalesOrderStatus.PAID, SalesOrderStatus.PAID)
+        ),
+        max_length=256,
+        help_text='The status of order.'
     )
 
     class Meta:

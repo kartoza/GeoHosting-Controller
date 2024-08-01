@@ -12,8 +12,9 @@ from geohosting.forms.activity import CreateInstanceForm
 from geohosting.models import (
     Activity, ActivityType, Region, Product, ProductMetadata,
     Cluster, ProductCluster, Instance, Package, WebhookEvent, ProductMedia,
-    SalesOrder, UserProfile
+    SalesOrder, SalesOrderStatus, UserProfile
 )
+from geohosting.utils.stripe import create_price_id, get_checkout_status
 
 
 def get_jenkins_status(modeladmin, request, queryset):
@@ -120,10 +121,18 @@ def publish_sales_order(modeladmin, request, queryset):
             )
 
 
+def update_order_status(modeladmin, request, queryset):
+    """Update order status."""
+    for order in queryset.filter(
+            order_status=SalesOrderStatus.WAITING_PAYMENT
+    ):
+        get_checkout_status(order)
+
+
 @admin.register(SalesOrder)
 class SalesOrderAdmin(admin.ModelAdmin):
-    list_display = ('date', 'package', 'customer')
-    actions = [publish_sales_order]
+    list_display = ('date', 'package', 'customer', 'order_status')
+    actions = [publish_sales_order, update_order_status]
 
 
 @admin.register(ProductCluster)
@@ -132,13 +141,21 @@ class ProductClusterAdmin(admin.ModelAdmin):
     list_filter = ('product', 'cluster')
 
 
+@admin.action(description="Create ERP Price")
+def create_erp_price(modeladmin, request, queryset):
+    for package in queryset:
+        create_price_id(package)
+
+
 @admin.register(Package)
 class PackageAdmin(admin.ModelAdmin):
     list_display = (
-        'name', 'price', 'product', 'created_at', 'updated_at', 'package_code'
+        'name', 'price', 'product', 'created_at', 'updated_at', 'package_code',
+        'stripe_price_id'
     )
     search_fields = ('name', 'product__name')
     list_filter = ('created_at', 'updated_at')
+    actions = [create_erp_price]
 
 
 admin.site.register(Region)

@@ -1,28 +1,37 @@
-import React, {useEffect} from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Box,
   Button,
+  ChakraProvider,
+  Container,
+  Divider,
+  Flex,
+  Grid,
+  GridItem,
   Heading,
-  Text,
+  HStack,
+  IconButton,
+  Image,
+  Link,
   List,
   ListItem,
-  ChakraProvider,
-  Flex,
-  Container,
-  Image,
-  Select,
-  SimpleGrid,
-  Grid, GridItem, useBreakpointValue, VStack, HStack, IconButton, Divider, Link
+  Text,
+  useBreakpointValue,
+  VStack
 } from '@chakra-ui/react';
-import {CheckIcon, ChevronDownIcon} from '@chakra-ui/icons';
-import {useLocation, useNavigate} from 'react-router-dom';
+import { CheckIcon } from '@chakra-ui/icons';
+import { useLocation, useNavigate } from 'react-router-dom';
 import customTheme from "../../theme/theme";
 import Navbar from "../../components/Navbar/Navbar";
 import Background from "../../components/Background/Background";
-import {formatPrice, packageName} from "../../utils/helpers";
-import {Package} from "../../redux/reducers/productsSlice";
+import { formatPrice, packageName } from "../../utils/helpers";
+import { Package } from "../../redux/reducers/productsSlice";
 import GeonodeIcon from "../../assets/images/GeoNode.svg"
-import { FaStripeS, FaCcStripe } from 'react-icons/fa6';
+import { FaCcStripe } from 'react-icons/fa6';
+import { useSelector } from "react-redux";
+import { RootState } from "../../redux/store";
+import axios from "axios";
+import { toast } from "react-toastify";
 
 
 interface FeatureList {
@@ -34,7 +43,13 @@ interface LocationState {
   pkg: Package;
 }
 
+const PaymentMethods = {
+  STRIPE: 'STRIPE'
+}
+
 const CheckoutPage: React.FC = () => {
+  const { token } = useSelector((state: RootState) => state.auth);
+
   const location = useLocation();
   const navigate = useNavigate();
   const state = location.state as LocationState;
@@ -42,6 +57,7 @@ const CheckoutPage: React.FC = () => {
 
   const localStorageData = localStorage.getItem('selectedProduct');
   const selectedData = localStorageData ? JSON.parse(localStorageData) : state;
+  const [paymentMethod, setPaymentMethod] = useState<string>(PaymentMethods.STRIPE);
 
   useEffect(() => {
     if (!selectedData) {
@@ -55,49 +71,72 @@ const CheckoutPage: React.FC = () => {
 
   const { product, pkg } = selectedData;
 
+  // Checkout function
+  async function checkout() {
+    try {
+      const response = await axios.post(`/api/package/${pkg.id}/checkout`, {}, {
+        headers: { Authorization: `Token ${token}` }
+      });
+      window.location.href = response.data
+    } catch (error) {
+      toast.error("There is error on checkout, please try it again.");
+    }
+  }
+
   return (
-     <ChakraProvider theme={customTheme}>
+    <ChakraProvider theme={customTheme}>
       <Flex direction="column" minHeight="100vh">
         <Box flex="1">
-          <Navbar />
-          <Background />
+          <Navbar/>
+          <Background/>
           <Container maxW='container.xl' mt="80px" mb="80px" bg="transparent">
-             <Grid gap={6} templateColumns={`repeat(${columns}, 1fr)`}>
-               <GridItem>
-                 <Box>
-                    <Text fontSize={22} color={'black'}>
-                      Payment Method
-                    </Text>
-                 </Box>
-                 <Box padding={8} backgroundColor="gray.100" borderRadius={10}>
+            <Grid gap={6} templateColumns={`repeat(${columns}, 1fr)`}>
+              <GridItem>
+                <Box>
+                  <Text fontSize={22} color={'black'}>
+                    Payment Method
+                  </Text>
+                </Box>
+                <Box padding={8} backgroundColor="gray.100" borderRadius={10}>
                   <VStack spacing={4} align="stretch">
-                    <Box border="1px" borderColor="gray.300" borderRadius="md" p="4">
+                    <Box border="1px" borderColor="gray.300" borderRadius="md"
+                         p="4">
                       <HStack justifyContent="space-between">
                         <HStack>
                           <FaCcStripe size="30px"/>
                         </HStack>
-                        <IconButton aria-label={'icon'} variant="ghost" />
+                        <IconButton aria-label={'icon'} variant="ghost"/>
                       </HStack>
                       <Text mt={2}>
-                        By purchasing this subscription and clicking "Continue", you agree to the <Link href="#">terms of service</Link>, <Link href="#">auto-renewal terms</Link>, electronic document delivery, and acknowledge the <Link href="#">privacy policy</Link>.
+                        By purchasing this subscription and clicking
+                        "Continue", you agree to the <Link href="#">terms of
+                        service</Link>, <Link href="#">auto-renewal
+                        terms</Link>, electronic document delivery, and
+                        acknowledge the <Link href="#">privacy policy</Link>.
                       </Text>
-                      <Button mt={4} leftIcon={<FaCcStripe />} colorScheme="blackAlpha" size="lg">
+                      <Button
+                        mt={4} leftIcon={<FaCcStripe/>}
+                        colorScheme={paymentMethod === PaymentMethods.STRIPE ? "blue" : "blackAlpha"}
+                        size="lg">
                         Pay with Stripe
                       </Button>
-                      <Divider mt={4} />
-                      <Text mt={2} fontSize="sm">Payments are processed in {pkg.currency}. Payment provider fees may apply.</Text>
+                      <Divider mt={4}/>
+                      <Text mt={2} fontSize="sm">Payments are processed
+                        in {pkg.currency}. Payment provider fees may
+                        apply.</Text>
                     </Box>
                   </VStack>
-                 </Box>
-               </GridItem>
-               <GridItem>
-                 <Box>
-                    <Text fontSize={22} color={'black'}>
-                      Order Summary
-                    </Text>
-                  </Box>
-                  <Box padding={8} backgroundColor="gray.100" borderRadius={10}>
-                    <Box border="1px" borderColor="gray.300" borderRadius="md" p="4">
+                </Box>
+              </GridItem>
+              <GridItem>
+                <Box>
+                  <Text fontSize={22} color={'black'}>
+                    Order Summary
+                  </Text>
+                </Box>
+                <Box padding={8} backgroundColor="gray.100" borderRadius={10}>
+                  <Box border="1px" borderColor="gray.300" borderRadius="md"
+                       p="4">
                     <Box display="flex" alignItems="center" pr={4} pb={4}>
                       <Image
                         src={product.image ? product.image : GeonodeIcon}
@@ -118,15 +157,25 @@ const CheckoutPage: React.FC = () => {
                       {pkg.feature_list &&
                         pkg.feature_list['spec'] &&
                         Object.entries(pkg.feature_list['spec']).map(([key, value]: any) => (
-                          <ListItem key={key} display="flex" alignItems="center">
-                            <CheckIcon color="green.500" mr={2} /> {value}
+                          <ListItem
+                            key={key} display="flex" alignItems="center">
+                            <CheckIcon color="green.500" mr={2}/> {value}
                           </ListItem>
                         ))}
                     </List>
-                    </Box>
                   </Box>
-               </GridItem>
-             </Grid>
+                </Box>
+              </GridItem>
+            </Grid>
+            <Box mt={4}>
+              <Button
+                w='100%'
+                colorScheme="orange"
+                onClick={checkout}
+              >
+                Continue
+              </Button>
+            </Box>
           </Container>
         </Box>
         <Box
@@ -138,7 +187,7 @@ const CheckoutPage: React.FC = () => {
           <Text color="white">Powered by Kartoza</Text>
         </Box>
       </Flex>
-     </ChakraProvider>
+    </ChakraProvider>
   );
 };
 

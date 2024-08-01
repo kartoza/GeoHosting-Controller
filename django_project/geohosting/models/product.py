@@ -131,6 +131,10 @@ class Package(models.Model):
         max_digits=10,
         decimal_places=2
     )
+    periodicity = models.CharField(
+        max_length=256,
+        default='monthly'
+    )
     feature_list = JSONField(
         blank=True,
         null=True
@@ -146,7 +150,14 @@ class Package(models.Model):
     )
     package_code = models.CharField(
         max_length=256,
+        blank=True,
+        null=True,
         help_text='This is the package code of the product on jenkins.'
+    )
+    stripe_price_id = models.CharField(
+        blank=True,
+        null=True,
+        help_text='Price id on the stripe.'
     )
 
     class Meta:
