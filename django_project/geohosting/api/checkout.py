@@ -37,7 +37,7 @@ class CheckoutStripeSessionAPI(APIView):
                 success_url=(
                     f'{domain}#/dashboard/orders/{order.id}'
                 ),
-                cancel_url=request.build_absolute_uri() + '?canceled=true',
+                cancel_url=f'{domain}#/checkout'
             )
             order.stripe_id = checkout_session.id
             order.save()
