@@ -185,7 +185,7 @@ def fetch_products_from_erpnext():
 @api_view(['GET'])
 @permission_classes([IsAdminUser])
 def fetch_products(request):
-    fetching_data = "'Products fetch initiated in the background."
+    fetching_data = "Products fetch initiated in the background."
 
     fetch_products_from_erpnext_task.delay()
 
