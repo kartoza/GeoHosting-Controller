@@ -1,11 +1,16 @@
 from datetime import timedelta
 
+import stripe
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db import models
 from django.utils.timezone import now
 
 from geohosting.models.user_profile import UserProfile
 from geohosting.utils.erpnext import post_to_erpnext
+from geohosting.utils.stripe import get_checkout_detail
+
+stripe.api_key = settings.STRIPE_SECRET_KEY
 
 User = get_user_model()
 
@@ -52,11 +57,6 @@ class SalesOrder(models.Model):
         default='',
         blank=True
     )
-    stripe_checkout_id = models.CharField(
-        blank=True,
-        null=True,
-        help_text='Checkout id on the stripe.'
-    )
     order_status = models.CharField(
         default=SalesOrderStatus.WAITING_PAYMENT,
         choices=(
@@ -68,6 +68,11 @@ class SalesOrder(models.Model):
         ),
         max_length=256,
         help_text='The status of order.'
+    )
+    stripe_id = models.CharField(
+        blank=True,
+        null=True,
+        help_text='Checkout id on the stripe.'
     )
 
     class Meta:
@@ -108,3 +113,10 @@ class SalesOrder(models.Model):
             self.save()
 
         return result
+
+    def update_order_status(self):
+        """Get checkout status."""
+        detail = get_checkout_detail(self.stripe_id)
+        if detail.invoice:
+            self.order_status = SalesOrderStatus.PAID
+            self.save()

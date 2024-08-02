@@ -6,9 +6,8 @@ from django.shortcuts import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 
-from geohosting.models.product import Package
+from geohosting.models import Package
 from geohosting.models.sales_order import SalesOrder
-from geohosting.utils.stripe import get_price_id
 
 
 class CheckoutStripeSessionAPI(APIView):
@@ -19,7 +18,7 @@ class CheckoutStripeSessionAPI(APIView):
     def post(self, request, pk):
         """Post to create checkout session."""
         package = get_object_or_404(Package, pk=pk)
-        price_id = get_price_id(package)
+        price_id = package.get_stripe_price_id()
         domain = request.build_absolute_uri('/')
         try:
             checkout_session = stripe.checkout.Session.create(
@@ -41,7 +40,7 @@ class CheckoutStripeSessionAPI(APIView):
             SalesOrder.objects.create(
                 package=package,
                 customer=request.user,
-                stripe_checkout_id=checkout_session.id
+                stripe_id=checkout_session.id
             )
             return HttpResponse(checkout_session.url)
         except Exception as e:
