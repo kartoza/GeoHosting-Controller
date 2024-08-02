@@ -8,6 +8,7 @@ from geohosting.api.activity import (
 )
 from geohosting.api.checkout import CheckoutStripeSessionAPI
 from geohosting.api.product import ProductViewSet
+from geohosting.api.sales_order import SalesOrderSetView
 from geohosting.api.token import CreateToken
 from geohosting.api.webhook import WebhookView
 from geohosting.views.auth import (
@@ -19,6 +20,7 @@ from geohosting.views.products import fetch_products
 router = DefaultRouter()
 router.register(r'activities', ActivityViewSet, basename='activities')
 router.register(r'products', ProductViewSet)
+router.register(r'orders', SalesOrderSetView, basename='orders')
 router.register(
     r'activity_types', ActivityTypeViewSet, basename='activity_types'
 )

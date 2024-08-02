@@ -1,4 +1,4 @@
-"""Checkout API"""
+"""Checkout API."""
 
 import stripe
 from django.http import HttpResponseServerError, HttpResponse
@@ -21,6 +21,10 @@ class CheckoutStripeSessionAPI(APIView):
         price_id = package.get_stripe_price_id()
         domain = request.build_absolute_uri('/')
         try:
+            order = SalesOrder.objects.create(
+                package=package,
+                customer=request.user
+            )
             checkout_session = stripe.checkout.Session.create(
                 customer_email=request.user.email,
                 line_items=[
@@ -31,17 +35,12 @@ class CheckoutStripeSessionAPI(APIView):
                 ],
                 mode='subscription',
                 success_url=(
-                        domain +
-                        '#/dashboard?success=true&session_id='
-                        '{CHECKOUT_SESSION_ID}'
+                    f'{domain}#/dashboard/orders/{order.id}'
                 ),
                 cancel_url=request.build_absolute_uri() + '?canceled=true',
             )
-            SalesOrder.objects.create(
-                package=package,
-                customer=request.user,
-                stripe_id=checkout_session.id
-            )
+            order.stripe_id = checkout_session.id
+            order.save()
             return HttpResponse(checkout_session.url)
         except Exception as e:
             return HttpResponseServerError(f'{e}')

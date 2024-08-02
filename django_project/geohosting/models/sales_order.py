@@ -114,9 +114,10 @@ class SalesOrder(models.Model):
 
         return result
 
-    def update_order_status(self):
+    def update_stripe_status(self):
         """Get checkout status."""
-        detail = get_checkout_detail(self.stripe_id)
-        if detail.invoice:
-            self.order_status = SalesOrderStatus.PAID
-            self.save()
+        if self.order_status == SalesOrderStatus.WAITING_PAYMENT:
+            detail = get_checkout_detail(self.stripe_id)
+            if detail.invoice:
+                self.order_status = SalesOrderStatus.PAID
+                self.save()

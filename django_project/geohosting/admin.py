@@ -12,7 +12,7 @@ from geohosting.forms.activity import CreateInstanceForm
 from geohosting.models import (
     Activity, ActivityType, Region, Product, ProductMetadata,
     Cluster, ProductCluster, Instance, Package, WebhookEvent, ProductMedia,
-    SalesOrder, SalesOrderStatus, UserProfile
+    SalesOrder, UserProfile
 )
 
 
@@ -120,18 +120,16 @@ def publish_sales_order(modeladmin, request, queryset):
             )
 
 
-def update_order_status(modeladmin, request, queryset):
+def update_stripe_status(modeladmin, request, queryset):
     """Update order status."""
-    for order in queryset.filter(
-            order_status=SalesOrderStatus.WAITING_PAYMENT
-    ):
-        order.update_order_status()
+    for order in queryset.filter():
+        order.update_stripe_status()
 
 
 @admin.register(SalesOrder)
 class SalesOrderAdmin(admin.ModelAdmin):
     list_display = ('date', 'package', 'customer', 'order_status')
-    actions = [publish_sales_order, update_order_status]
+    actions = [publish_sales_order, update_stripe_status]
 
 
 @admin.register(ProductCluster)
