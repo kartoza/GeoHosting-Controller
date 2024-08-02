@@ -1,9 +1,10 @@
 """Checkout API."""
 
 import stripe
-from django.http import HttpResponseServerError, HttpResponse
+from django.http import HttpResponseServerError
 from django.shortcuts import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from geohosting.models import Package
@@ -26,6 +27,7 @@ class CheckoutStripeSessionAPI(APIView):
                 customer=request.user
             )
             checkout_session = stripe.checkout.Session.create(
+                ui_mode='embedded',
                 customer_email=request.user.email,
                 line_items=[
                     {
@@ -34,13 +36,12 @@ class CheckoutStripeSessionAPI(APIView):
                     },
                 ],
                 mode='subscription',
-                success_url=(
+                return_url=(
                     f'{domain}#/dashboard/orders/{order.id}'
-                ),
-                cancel_url=f'{domain}#/checkout'
+                )
             )
             order.stripe_id = checkout_session.id
             order.save()
-            return HttpResponse(checkout_session.url)
+            return Response(checkout_session.client_secret)
         except Exception as e:
             return HttpResponseServerError(f'{e}')

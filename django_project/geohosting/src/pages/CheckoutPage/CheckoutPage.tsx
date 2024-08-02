@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   Box,
   Button,
@@ -28,15 +28,8 @@ import { formatPrice, packageName } from "../../utils/helpers";
 import { Package } from "../../redux/reducers/productsSlice";
 import GeonodeIcon from "../../assets/images/GeoNode.svg"
 import { FaCcStripe } from 'react-icons/fa6';
-import { useSelector } from "react-redux";
-import { RootState } from "../../redux/store";
-import axios from "axios";
-import { toast } from "react-toastify";
+import { StripePaymentModal } from "./Stripe";
 
-
-interface FeatureList {
-  spec: { [key: string]: string };
-}
 
 interface LocationState {
   productName: string;
@@ -48,8 +41,6 @@ const PaymentMethods = {
 }
 
 const CheckoutPage: React.FC = () => {
-  const { token } = useSelector((state: RootState) => state.auth);
-
   const location = useLocation();
   const navigate = useNavigate();
   const state = location.state as LocationState;
@@ -58,6 +49,7 @@ const CheckoutPage: React.FC = () => {
   const localStorageData = localStorage.getItem('selectedProduct');
   const selectedData = localStorageData ? JSON.parse(localStorageData) : state;
   const [paymentMethod, setPaymentMethod] = useState<string>(PaymentMethods.STRIPE);
+  const stripePaymentModalRef = useRef(null);
 
   useEffect(() => {
     if (!selectedData) {
@@ -73,13 +65,9 @@ const CheckoutPage: React.FC = () => {
 
   // Checkout function
   async function checkout() {
-    try {
-      const response = await axios.post(`/api/package/${pkg.id}/checkout`, {}, {
-        headers: { Authorization: `Token ${token}` }
-      });
-      window.location.href = response.data
-    } catch (error) {
-      toast.error("There is error on checkout, please try it again.");
+    if (stripePaymentModalRef?.current) {
+      // @ts-ignore
+      stripePaymentModalRef?.current?.open();
     }
   }
 
@@ -186,6 +174,10 @@ const CheckoutPage: React.FC = () => {
         >
           <Text color="white">Powered by Kartoza</Text>
         </Box>
+        <StripePaymentModal
+          ref={stripePaymentModalRef}
+          packageId={pkg.id}
+        />
       </Flex>
     </ChakraProvider>
   );
