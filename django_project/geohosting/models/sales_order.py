@@ -120,4 +120,5 @@ class SalesOrder(models.Model):
             detail = get_checkout_detail(self.stripe_id)
             if detail.invoice:
                 self.order_status = SalesOrderStatus.PAID
+                self.post_to_erpnext()
                 self.save()
