@@ -12,7 +12,7 @@ class UserProfile(models.Model):
     erpnext_code = models.CharField(
         max_length=100, blank=True, null=True)
     reset_token = models.CharField(
-        max_length=64, blank=True, null=True) 
+        max_length=64, blank=True, null=True)
 
     def __str__(self):
         return self.user.username

@@ -98,12 +98,15 @@ class PasswordResetView(APIView):
         user_profile.save()
 
         reset_link = f"{FRONTEND_URL}/reset-password?token={reset_token}"
+        message = (
+            'Please use the following link to reset your password: '
+            f'{reset_link}'
+        )
 
         # TODO @Juanique to create a proper email template
         send_mail(
             'Password Reset Request',
-            f'Please use the following link to reset your password: {
-                reset_link}',
+            message,
             DEFAULT_FROM_EMAIL,
             [email],
             fail_silently=False,
