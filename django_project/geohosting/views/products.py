@@ -11,8 +11,9 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
 
+from geohosting.models.package import Package
 from geohosting.models.product import (
-    Product, ProductMetadata, ProductMedia, Package
+    Product, ProductMetadata, ProductMedia
 )
 from geohosting.utils.erpnext import (
     fetch_erpnext_data,
@@ -185,7 +186,7 @@ def fetch_products_from_erpnext():
 @api_view(['GET'])
 @permission_classes([IsAdminUser])
 def fetch_products(request):
-    fetching_data = "'Products fetch initiated in the background."
+    fetching_data = "Products fetch initiated in the background."
 
     fetch_products_from_erpnext_task.delay()
 
