@@ -12,10 +12,10 @@ from geohosting.api.sales_order import SalesOrderSetView
 from geohosting.api.token import CreateToken
 from geohosting.api.webhook import WebhookView
 from geohosting.views.auth import (
-    CustomAuthToken, 
-    logout, 
-    ValidateTokenView, 
-    RegisterView, 
+    CustomAuthToken,
+    logout,
+    ValidateTokenView,
+    RegisterView,
     PasswordResetView,
     PasswordResetConfirmView
 )
@@ -43,12 +43,12 @@ api = [
     path('auth/register/',
          RegisterView.as_view(), name='register'),
     path('auth/logout/', logout, name='api_logout'),
-    path('auth/reset-password/', 
-        PasswordResetView.as_view(), 
-        name='reset_password'),
+    path('auth/reset-password/',
+         PasswordResetView.as_view(),
+         name='reset_password'),
     path(
-        'auth/password-reset-confirm/', 
-        PasswordResetConfirmView.as_view(), 
+        'auth/password-reset-confirm/',
+        PasswordResetConfirmView.as_view(),
         name='password_reset_confirm'),
     path('auth/validate-token/',
          ValidateTokenView.as_view(), name='validate-token'),
@@ -62,6 +62,7 @@ api += router.urls
 
 urlpatterns = [
     path('', HomeView.as_view(), name='home'),
-    path('reset-password/', ResetPasswordView.as_view(), name='reset_password'),
+    path('reset-password/',
+         ResetPasswordView.as_view(), name='reset_password'),
     path('api/', include(api)),
 ]
