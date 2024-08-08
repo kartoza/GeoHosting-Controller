@@ -26,6 +26,7 @@ def get_jenkins_status(modeladmin, request, queryset):
 @admin.register(Ticket)
 class TicketAdmin(admin.ModelAdmin):
     """Ticket admin."""
+
     list_display = ('id', 'customer', 'subject',
                     'status', 'created_at', 'updated_at')
     list_filter = ('status', 'created_at', 'updated_at')
@@ -41,6 +42,7 @@ class TicketAdmin(admin.ModelAdmin):
 @admin.register(Attachment)
 class AttachmentAdmin(admin.ModelAdmin):
     """Attachment admin."""
+
     list_display = ('id', 'ticket', 'file', 'uploaded_at')
     list_filter = ('uploaded_at',)
     search_fields = ('ticket__subject', 'ticket__customer')
