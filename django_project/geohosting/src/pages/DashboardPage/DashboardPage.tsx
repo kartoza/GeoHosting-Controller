@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   ChakraProvider,
   Box,
@@ -9,6 +9,7 @@ import {
   CloseButton,
   VStack,
   HStack,
+  Button,
 } from '@chakra-ui/react';
 import { HamburgerIcon } from '@chakra-ui/icons';
 import { useDispatch } from 'react-redux';
@@ -16,10 +17,13 @@ import { useNavigate } from 'react-router-dom';
 import { logout } from '../../redux/reducers/authSlice';
 import customTheme from '../../theme/theme';
 import {AppDispatch} from "../../redux/store";
+import SupportTicketForm from '../../components/SupportTicketForm/SupportTicketForm';
+
 
 const SidebarContent = ({ onClose, ...rest }) => {
   const dispatch: AppDispatch = useDispatch();
   const navigate = useNavigate();
+  
 
   const handleLogout = () => {
     dispatch(logout()).then(() => {
@@ -62,6 +66,11 @@ const SidebarContent = ({ onClose, ...rest }) => {
 const DashboardPage = ({ title="Dashboard", children }) => {
   const [isOpen, setIsOpen] = React.useState(false);
   const toggleSidebar = () => setIsOpen(!isOpen);
+  const [showSupportForm, setShowSupportForm] = useState(false);
+
+  const handleCreateIssue = () => {
+    setShowSupportForm(true);
+  };
 
   return (
     <ChakraProvider theme={customTheme}>
@@ -87,9 +96,22 @@ const DashboardPage = ({ title="Dashboard", children }) => {
             />
             <Heading size="md" textAlign="center">{ title }</Heading>
           </Flex>
+          
 
           <Box p={4}>
             { children }
+            <Box mt={2}>
+              {!showSupportForm && (
+                <Button colorScheme="blue" onClick={handleCreateIssue}>
+                  Create Issue
+                </Button>
+              )}
+              {showSupportForm && (
+                <Flex justifyContent="center">
+                  <SupportTicketForm onClose={() => setShowSupportForm(false)} />
+                </Flex>
+              )}
+            </Box>
           </Box>
         </Box>
       </Box>

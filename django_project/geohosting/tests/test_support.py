@@ -1,4 +1,3 @@
-# tests.py
 from django.test import TestCase
 from rest_framework.test import APIClient
 from rest_framework import status
@@ -6,7 +5,6 @@ from geohosting.models.support import Ticket
 from geohosting.serializer.support import TicketSerializer
 from django.contrib.auth.models import User
 from django.core.files.uploadedfile import SimpleUploadedFile
-
 
 
 class TicketTests(TestCase):
@@ -17,6 +15,8 @@ class TicketTests(TestCase):
             email='tinashe@test.com',
             password='password123'
         )
+        # Authenticate the client
+        self.client.force_authenticate(user=self.user)
 
     def test_create_ticket_success(self):
         # Define the payload for a successful ticket creation
@@ -42,10 +42,16 @@ class TicketTests(TestCase):
         self.assertIn('details', response.data)
 
 
-
 class AttachmentTests(TestCase):
     def setUp(self):
         self.client = APIClient()
+        self.user = User.objects.create_user(
+            username='testuser',
+            email='tinashe@test.com',
+            password='password123'
+        )
+        # Authenticate the client
+        self.client.force_authenticate(user=self.user)
         # Create a test ticket
         self.ticket = Ticket.objects.create(
             subject='Test Ticket',
@@ -85,3 +91,4 @@ class AttachmentTests(TestCase):
             format='multipart'
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data['error'], 'No files provided')

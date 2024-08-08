@@ -1,6 +1,11 @@
 # views.py
 from rest_framework import status
-from rest_framework.decorators import api_view, parser_classes
+from rest_framework.decorators import (
+    api_view,
+    parser_classes,
+    permission_classes
+)
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from geohosting.models.support import Attachment
 from geohosting.serializer.support import (
@@ -14,6 +19,7 @@ from django.core.files.storage import default_storage
 
 
 @api_view(['POST'])
+@permission_classes([IsAuthenticated])
 def create_ticket(request):
     data = request.data
     ticket_serializer = TicketSerializer(data=data)
@@ -28,6 +34,7 @@ def create_ticket(request):
 
 @api_view(['POST'])
 @parser_classes([MultiPartParser])
+@permission_classes([IsAuthenticated])
 def upload_attachments(request, ticket_id):
     try:
         ticket = Ticket.objects.get(id=ticket_id)

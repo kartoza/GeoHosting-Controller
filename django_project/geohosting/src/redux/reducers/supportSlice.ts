@@ -69,7 +69,8 @@ export const createTicket = createAsyncThunk(
   'support/createTicket',
   async (ticketData: CreateTicketData, thunkAPI) => {
     try {
-      const response = await axios.post('/api/support/tickets/', ticketData);
+      const token = localStorage.getItem('token');
+      const response = await axios.post('/api/support/tickets/', ticketData, { headers: { Authorization: `Token ${token}` }});
       return response.data;
     } catch (error: any) {
       return thunkAPI.rejectWithValue(error.response?.data || 'An unknown error occurred');

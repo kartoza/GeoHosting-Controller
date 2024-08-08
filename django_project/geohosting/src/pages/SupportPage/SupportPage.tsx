@@ -1,287 +1,99 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   ChakraProvider,
   Box,
-  Button,
   Flex,
-  FormControl,
-  FormLabel,
-  Input,
-  Select,
+  Text,
+  Heading,
+  IconButton,
+  CloseButton,
   VStack,
   HStack,
-  Table,
-  Thead,
-  Tbody,
-  Tr,
-  Th,
-  Td,
-  IconButton,
-  Textarea,
-  Text,
+  Button,
 } from '@chakra-ui/react';
-import { CKEditor } from '@ckeditor/ckeditor5-react';
-import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
-import { DeleteIcon } from '@chakra-ui/icons';
+import { HamburgerIcon } from '@chakra-ui/icons';
+import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import { logout } from '../../redux/reducers/authSlice';
 import customTheme from '../../theme/theme';
-import DashboardPage from '../DashboardPage/DashboardPage';
-import styled from '@emotion/styled';
-import { useDispatch, useSelector } from 'react-redux';
-import { AppDispatch, RootState } from '../../redux/store';
-import { createTicket } from '../../redux/reducers/supportSlice';
-import { uploadAttachments } from '../../redux/reducers/supportSlice';
-import { toast } from 'react-toastify';
+import {AppDispatch} from "../../redux/store";
 
-// TODO's
-// 1. fetch issue types from db
-
-const customEditorConfig = {
-  toolbar: {
-    items: [
-      'heading',
-      '|',
-      'bold',
-      'italic',
-      'link',
-      '|',
-      'bulletedList',
-      'numberedList',
-      '|',
-      'blockQuote',
-      'insertTable',
-      '|',
-      'undo',
-      'redo'
-    ]
-  },
-};
-
-interface Attachment {
-  name: string;
-  file: File;
-}
-
-const EditorContainer = styled.div`
-  .ck-editor__editable {
-    height: 200px;
-  }
-`;
-
-const FormContainer = styled(Box)`
-  min-height: 600px; 
-  max-height: 80vh;
-  overflow-y: auto;
-`;
-
-const SupportPage: React.FC = () => {
+const SidebarContent = ({ onClose, ...rest }) => {
   const dispatch: AppDispatch = useDispatch();
-  const { loading, error } = useSelector((state: RootState) => state.support);
-  const [showForm, setShowForm] = useState(false);
-  const [subject, setSubject] = useState<string>('');
-  const [issueType, setIssueType] = useState<string>('');
-  const [details, setDetails] = useState<string>('');
-  const [attachments, setAttachments] = useState<Attachment[]>([]);
-  const [editorData, setEditorData] = useState<string>('');
-  const [customerEmail, setCustomerEmail] = useState<string>('');
+  const navigate = useNavigate();
+  
 
-  useEffect(() => {
-    const email = localStorage.getItem('email') || '';
-    setCustomerEmail(email);
-  }, []);
-
-  useEffect(() => {
-    if (error) {
-      toast.error('An error occurred. Please try again.');
-    }
-  }, [error]);
-
-  const handleCreateIssue = () => {
-    setShowForm(true);
-  };
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      const newAttachments = Array.from(e.target.files).map(file => ({
-        name: file.name,
-        file: file,
-      }));
-      setAttachments(prevAttachments => [...prevAttachments, ...newAttachments]);
-    }
-  };
-
-  const handleDeleteAttachment = (index: number) => {
-    setAttachments(attachments.filter((_, i) => i !== index));
-  };
-
-  const handleSubmit = () => {
-    const customer = customerEmail;
-
-    dispatch(createTicket({
-      subject,
-      details: editorData,
-      status: 'open',
-      customer
-    })).then((result: any) => {
-      if (result.meta.requestStatus === 'fulfilled') {
-        toast.success('Ticket created successfully.');
-        setShowForm(false);
-        setSubject('');
-        setIssueType('');
-        setDetails('');
-        setAttachments([]);
-
-        const ticketId = result.payload.id;
-
-        dispatch(uploadAttachments({
-          ticketId,
-          files: attachments.map(attachment => attachment.file)
-        })).then((result: any) => {
-          if (result.meta.requestStatus === 'fulfilled') {
-            toast.success('Attachment uploaded successfully.');
-          } else {
-            toast.error('Failed to upload attachment.');
-          }
-        });
-      } else {
-        toast.error('Failed to create ticket.');
-      }
+  const handleLogout = () => {
+    dispatch(logout()).then(() => {
+      navigate('/');
     });
   };
 
   return (
-    <ChakraProvider theme={customTheme}>
-      <DashboardPage title="Support">
-        <Box textAlign="center" py={10}>
-          <Button colorScheme="blue" onClick={handleCreateIssue}>
-            Create Issue
-          </Button>
+    <Box
+      bg="blue.500"
+      w={{ base: 'full', md: 60 }}
+      pos="fixed"
+      h="full"
+      {...rest}
+    >
+      <Flex h="20" alignItems="center" mx="8" justifyContent="space-between">
+        <Text fontSize="2xl" fontFamily="monospace" fontWeight="bold" color="white">
+          Dashboard
+        </Text>
+        <CloseButton display={{ base: 'flex', md: 'none' }} onClick={onClose} color="white" />
+      </Flex>
+      <VStack spacing={4} align="start" mt={5}>
+        <Box px={4} py={2} color="white" _hover={{ bg: 'gray.700' }} w="full" onClick={() => navigate('/')}>
+          Home
         </Box>
+        <Box px={4} py={2} color="white" _hover={{ bg: 'gray.700' }} w="full">
+          Orders
+        </Box>
+        <Box px={4} py={2} color="white" _hover={{ bg: 'gray.700' }} w="full" onClick={() => navigate('/support')}>
+          Support
+        </Box>
+        <Box px={4} py={2} color="white" _hover={{ bg: 'gray.700' }} w="full" onClick={handleLogout}>
+          Logout
+        </Box>
+      </VStack>
+    </Box>
+  );
+};
 
-        {showForm && (
-          <Flex justifyContent="center">
-            <FormContainer
-              p={8}
-              maxWidth="700px"
-              borderWidth={1}
-              borderRadius={8}
-              boxShadow="lg"
-              bg="white"
-            >
-              <VStack spacing={4}>
-                <FormControl id="customer" isReadOnly>
-                  <FormLabel>Customer</FormLabel>
-                  <Input type="text" value={customerEmail} isReadOnly bg="gray.100" />
-                </FormControl>
+const SupportPage: React.FC = () => {
+  const [isOpen, setIsOpen] = React.useState(false);
+  const toggleSidebar = () => setIsOpen(!isOpen);
 
-                <FormControl id="subject" isRequired>
-                  <FormLabel>Subject</FormLabel>
-                  <Input
-                    type="text"
-                    placeholder="Enter issue subject"
-                    value={subject}
-                    onChange={(e) => setSubject(e.target.value)}
-                  />
-                </FormControl>
-
-                <FormControl id="issueType" isRequired>
-                  <FormLabel>Issue Type</FormLabel>
-                  <Select
-                    placeholder="Select issue type"
-                    value={issueType}
-                    onChange={(e) => setIssueType(e.target.value)}
-                  >
-                    <option value="bug">Bug</option>
-                    <option value="feature">Feature Request</option>
-                    <option value="support">Support</option>
-                  </Select>
-                </FormControl>
-
-                <FormControl id="issueDetails" isRequired>
-                  <FormLabel>Issue Details</FormLabel>
-                  <EditorContainer>
-                    <CKEditor
-                      editor={ClassicEditor}
-                      config={customEditorConfig}
-                      data={editorData}
-                      onChange={(event, editor) => {
-                        const data = editor.getData();
-                        setEditorData(data);
-                      }}
-                    />
-                  </EditorContainer>
-                </FormControl>
-
-                <FormControl id="attachments">
-                  <FormLabel>Attachments</FormLabel>
-                  <Input 
-                    type="file" 
-                    multiple 
-                    onChange={handleFileChange} 
-                    sx={{
-                      '&::file-selector-button': {
-                        border: 'none',
-                        color: 'white',
-                        bg: 'blue.500',
-                        fontSize: 'sm',
-                        fontWeight: 'bold',
-                        p: '2',
-                        cursor: 'pointer',
-                        borderRadius: 'md',
-                        mt: '1.5px',
-                        _hover: {
-                          bg: 'blue.600',
-                        },
-                      },
-                    }}
-                  />
-                </FormControl>
-
-                {attachments.length > 0 && (
-                  <Table variant="simple">
-                    <Thead>
-                      <Tr>
-                        <Th>File Name</Th>
-                        <Th>Action</Th>
-                      </Tr>
-                    </Thead>
-                    <Tbody>
-                      {attachments.map((attachment, index) => (
-                        <Tr key={index}>
-                          <Td>{attachment.name}</Td>
-                          <Td>
-                            <IconButton
-                              aria-label="Delete attachment"
-                              icon={<DeleteIcon />}
-                              onClick={() => handleDeleteAttachment(index)}
-                              colorScheme="red"
-                            />
-                          </Td>
-                        </Tr>
-                      ))}
-                    </Tbody>
-                  </Table>
-                )}
-
-                <HStack spacing={4}>
-                  <Button 
-                    colorScheme="blue" 
-                    onClick={handleSubmit}
-                    isLoading={loading}
-                  >
-                    Submit
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    onClick={() => setShowForm(false)}
-                  >
-                    Cancel
-                  </Button>
-                </HStack>
-              </VStack>
-            </FormContainer>
+  return (
+    <ChakraProvider theme={customTheme}>
+      <Box minH="100vh">
+        <SidebarContent onClose={toggleSidebar} display={{ base: isOpen ? 'block' : 'none', md: 'block' }} />
+        <Box ml={{ base: 0, md: 60 }} transition="0.3s ease">
+          <Flex
+            as="header"
+            align="center"
+            justify="space-between"
+            w="full"
+            px={4}
+            bg="gray.200"
+            borderBottomWidth="1px"
+            borderColor="gray.300"
+            h="14"
+          >
+            <IconButton
+              aria-label="Open menu"
+              icon={<HamburgerIcon />}
+              display={{ base: 'inline-flex', md: 'none' }}
+              onClick={toggleSidebar}
+            />
+            <Heading size="md" textAlign="center">{ 'Support' }</Heading>
           </Flex>
-        )}
-      </DashboardPage>
+          
+
+          
+        </Box>
+      </Box>
     </ChakraProvider>
   );
 };
