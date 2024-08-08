@@ -34,7 +34,7 @@ const SidebarContent = ({ onClose, ...rest }) => {
       pos="fixed"
       h="full"
       {...rest}
-    >
+    > 
       <Flex h="20" alignItems="center" mx="8" justifyContent="space-between">
         <Text fontSize="2xl" fontFamily="monospace" fontWeight="bold" color="white">
           Dashboard
@@ -48,7 +48,7 @@ const SidebarContent = ({ onClose, ...rest }) => {
         <Box px={4} py={2} color="white" _hover={{ bg: 'gray.700' }} w="full">
           Orders
         </Box>
-        <Box px={4} py={2} color="white" _hover={{ bg: 'gray.700' }} w="full">
+        <Box px={4} py={2} color="white" _hover={{ bg: 'gray.700' }} w="full" onClick={() => navigate('/support')}>
           Support
         </Box>
         <Box px={4} py={2} color="white" _hover={{ bg: 'gray.700' }} w="full" onClick={handleLogout}>

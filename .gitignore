@@ -4,6 +4,7 @@
 deployment/.env
 deployment/docker-compose.override.yml
 deployment/volumes
+deployment/docker/Dockerfile
 
 __pycache__/
 
