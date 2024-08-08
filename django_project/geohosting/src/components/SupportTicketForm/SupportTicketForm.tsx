@@ -81,12 +81,7 @@ const SupportTicketForm: React.FC<SupportTicketFormProps> = ({ onClose }) => {
     const email = localStorage.getItem('email') || '';
     setCustomerEmail(email);
   }, []);
-
-  useEffect(() => {
-    if (error) {
-      toast.error('An error occurred. Please try again.');
-    }
-  }, [error]);
+ 
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
