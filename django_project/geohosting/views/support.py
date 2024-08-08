@@ -34,11 +34,19 @@ def upload_attachments(request, ticket_id):
     except Ticket.DoesNotExist:
         return Response(
             {'error': 'Ticket not found'},
-            status=status.HTTP_404_NOT_FOUND)
+            status=status.HTTP_404_NOT_FOUND
+        )
 
     files = request.FILES.getlist('attachments')
-    attachments = []
 
+    # Check if files are provided
+    if not files:
+        return Response(
+            {'error': 'No files provided'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    attachments = []
     for file in files:
         file_content = ContentFile(file.read())
         file_name = default_storage.save(
